@@ -33,7 +33,6 @@ app.get("/api/jamendo-tracks", async (req, res) => {
     order: req.query.order || "popularity_total",
     include: "musicinfo+licenses",
     audioformat: "mp31",
-    fuzziness: "1",
   });
 
   if (req.query.tags) params.set("tags", req.query.tags);
@@ -62,7 +61,7 @@ app.get("/api/jamendo-tracks", async (req, res) => {
 });
 
 app.get("/", (_req, res) => {
-  res.type("text").send("NovaTok Pixabay proxy is running.");
+  res.type("text").send("NovaTok Jamendo proxy is running.");
 });
 
 app.listen(PORT, () => {
