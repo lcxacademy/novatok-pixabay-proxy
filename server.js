@@ -5,11 +5,11 @@ const fetch = require("node-fetch");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const PIXABAY_MUSIC_ENDPOINT = "https://pixabay.com/api/music/";
-const PIXABAY_KEY = process.env.PIXABAY_KEY;
+const JAMENDO_ENDPOINT = "https://api.jamendo.com/v3.0/tracks/";
+const JAMENDO_CLIENT_ID = process.env.JAMENDO_CLIENT_ID;
 
-if (!PIXABAY_KEY) {
-  console.error("[NovaTok Proxy] Missing PIXABAY_KEY. Set it in the environment or .env file.");
+if (!JAMENDO_CLIENT_ID) {
+  console.error("[NovaTok Proxy] Missing JAMENDO_CLIENT_ID. Set it in the environment.");
   process.exit(1);
 }
 
@@ -19,25 +19,27 @@ app.use(
   })
 );
 
-app.get("/api/pixabay-music", async (req, res) => {
+app.get("/api/jamendo-tracks", async (req, res) => {
   const query = (req.query.q || "").toString().trim();
   if (!query) {
     return res.status(400).json({ error: "Missing required query parameter 'q'." });
   }
 
   const params = new URLSearchParams({
-    key: PIXABAY_KEY,
-    q: query,
-    per_page: req.query.per_page || "8",
-    order: req.query.order || "popular",
-    safesearch: "true",
+    client_id: JAMENDO_CLIENT_ID,
+    format: "json",
+    limit: req.query.limit || "8",
+    search: query,
+    order: req.query.order || "popularity_total",
+    include: "musicinfo+licenses",
+    audioformat: "mp31",
+    fuzziness: "1",
   });
 
-  if (req.query.min_duration) params.set("min_duration", req.query.min_duration);
-  if (req.query.max_duration) params.set("max_duration", req.query.max_duration);
+  if (req.query.tags) params.set("tags", req.query.tags);
   if (req.query.page) params.set("page", req.query.page);
 
-  const targetUrl = `${PIXABAY_MUSIC_ENDPOINT}?${params.toString()}`;
+  const targetUrl = `${JAMENDO_ENDPOINT}?${params.toString()}`;
 
   try {
     const response = await fetch(targetUrl, {
@@ -47,15 +49,15 @@ app.get("/api/pixabay-music", async (req, res) => {
     });
     if (!response.ok) {
       const body = await response.text();
-      console.error("[NovaTok Proxy] Pixabay error", response.status, body);
-      return res.status(response.status).json({ error: "Pixabay API error", status: response.status });
+      console.error("[NovaTok Proxy] Jamendo error", response.status, body);
+      return res.status(response.status).json({ error: "Jamendo API error", status: response.status });
     }
     const data = await response.json();
     res.set("Cache-Control", "public, max-age=300");
     res.json(data);
   } catch (error) {
-    console.error("[NovaTok Proxy] Failed to reach Pixabay", error);
-    res.status(502).json({ error: "Unable to reach Pixabay API" });
+    console.error("[NovaTok Proxy] Failed to reach Jamendo", error);
+    res.status(502).json({ error: "Unable to reach Jamendo API" });
   }
 });
 

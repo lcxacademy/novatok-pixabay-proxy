@@ -1,6 +1,6 @@
-# NovaTok Pixabay Proxy
+# NovaTok Jamendo Proxy
 
-This micro-service hides your private Pixabay API key and lets the NovaTok front-end fetch royalty-free music suggestions without exposing credentials.
+This micro-service hides your Jamendo API credentials and lets the NovaTok front-end fetch royalty-free music suggestions without exposing secrets.
 
 ## Quick start
 
@@ -13,7 +13,7 @@ This micro-service hides your private Pixabay API key and lets the NovaTok front
 
    Create a `.env` file next to `server.js`:
    ```
-   PIXABAY_KEY=YOUR_PIXABAY_KEY
+   JAMENDO_CLIENT_ID=YOUR_JAMENDO_CLIENT_ID
    # Optional: lock the proxy to specific origins (comma separated)
    # CORS_ORIGIN=https://yourdomain.com,https://www.yourdomain.com
    ```
@@ -22,7 +22,7 @@ This micro-service hides your private Pixabay API key and lets the NovaTok front
    ```bash
    npm start
    ```
-   The proxy listens on `http://localhost:3001`. Hitting `http://localhost:3001/api/pixabay-music?q=travel vlog` should return JSON from Pixabay.
+   The proxy listens on `http://localhost:3001`. Hitting `http://localhost:3001/api/jamendo-tracks?q=travel` should return JSON from Jamendo.
 
 4. **Deploy**
 
@@ -30,21 +30,21 @@ This micro-service hides your private Pixabay API key and lets the NovaTok front
 
 5. **Configure NovaTok**
 
-   Host the proxy at the same origin as your front-end **or** adjust the `PIXABAY_PROXY_ENDPOINT` constant in `app.js` to point to the deployed URL, e.g.:
+   Host the proxy at the same origin as your front-end **or** adjust the `MUSIC_PROXY_ENDPOINT` constant in `app.js` to point to the deployed URL, e.g.:
    ```js
-   const PIXABAY_PROXY_ENDPOINT = "https://yourdomain.com/api/pixabay-music";
+   const MUSIC_PROXY_ENDPOINT = "https://yourdomain.com/api/jamendo-tracks";
    ```
 
 ## Endpoints
 
-- `GET /api/pixabay-music?q=keyword`
+- `GET /api/jamendo-tracks?q=keyword`
   - `q` – required search term (e.g. `fitness hype`)
-  - `per_page`, `order`, `min_duration`, `max_duration`, `page` – optional filters passed through to Pixabay
+  - `limit`, `order`, `tags`, `page` – optional filters passed through to Jamendo
 
-The proxy returns the Pixabay JSON response unchanged and caches it for five minutes.
+The proxy returns the Jamendo JSON response unchanged and caches it for five minutes.
 
 ## Notes
 
-- The provided key is included for convenience; if you cycle the key later, just update the `.env` file or hosting environment variable.
+- Keep your Jamendo client ID secret; store it in `.env` locally and as an environment variable in production.
 - If you want to restrict access, set `CORS_ORIGIN` to the exact URL(s) of your NovaTok deployment.
 

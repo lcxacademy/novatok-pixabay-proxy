@@ -1,7 +1,7 @@
 {
   "name": "novatok-pixabay-proxy",
   "version": "1.0.0",
-  "description": "Lightweight proxy for NovaTok to fetch Pixabay music without exposing API credentials.",
+  "description": "Lightweight proxy for NovaTok to fetch Jamendo music without exposing API credentials.",
   "private": true,
   "main": "server.js",
   "scripts": {
